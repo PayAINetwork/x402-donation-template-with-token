@@ -51,7 +51,16 @@ export function useX402Payment() {
       });
 
       if (!response.ok) {
-        throw new Error(`Request failed: ${response.statusText}`);
+        // Try to get more error details
+        let errorMessage = `Request failed: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          console.error("X402 Error Response:", errorData);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Response wasn't JSON, use statusText
+        }
+        throw new Error(errorMessage);
       }
 
       const result = (await response.json()) as TResponse;

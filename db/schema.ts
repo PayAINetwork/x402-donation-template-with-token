@@ -1,29 +1,40 @@
-import { pgTable, serial, timestamp, text, decimal, bigint, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  timestamp,
+  text,
+  decimal,
+  bigint,
+  index,
+} from "drizzle-orm/pg-core";
 
 // Donations table: tracks donations for this specific token
-export const donations = pgTable('donations', {
-  id: serial('id').primaryKey(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  
-  // Donor
-  donorAddress: text('donor_address').notNull(),
-  donorName: text('donor_name'),
-  
-  // Amounts
-  amountUsd: decimal('amount_usd', { precision: 10, scale: 2 }).notNull(),
-  tokensAmount: bigint('tokens_amount', { mode: 'number' }).notNull(),
-  
-  // Message
-  message: text('message'),
-  
-  // Transaction
-  transactionSignature: text('transaction_signature'),
-}, (table) => [
-  index('idx_donations_donor').on(table.donorAddress),
-  index('idx_donations_created_at').on(table.createdAt),
-]);
+export const donations = pgTable(
+  "donations",
+  {
+    id: serial("id").primaryKey(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+
+    // Donor
+    donorAddress: text("donor_address").notNull(),
+    donorName: text("donor_name"),
+
+    // Amounts
+    amountUsd: decimal("amount_usd", { precision: 10, scale: 2 }).notNull(),
+    tokensAmount: bigint("tokens_amount", { mode: "number" }).notNull(),
+
+    // Message
+    message: text("message"),
+
+    // Transaction
+    transactionSignature: text("transaction_signature"),
+  },
+  (table) => [
+    index("idx_donations_donor").on(table.donorAddress),
+    index("idx_donations_created_at").on(table.createdAt),
+  ]
+);
 
 // TypeScript types for inserts and selects
 export type InsertDonation = typeof donations.$inferInsert;
 export type SelectDonation = typeof donations.$inferSelect;
-

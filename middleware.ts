@@ -258,7 +258,8 @@ const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || "solana-devnet") as
   | "solana"
   | "solana-devnet";
 const resourceWallet = process.env.RESOURCE_SERVER_WALLET_ADDRESS;
-const tokenMint = process.env.TOKEN_MINT || process.env.NEXT_PUBLIC_TOKEN_MINT_ADDRESS;
+const tokenMint =
+  process.env.TOKEN_MINT || process.env.NEXT_PUBLIC_TOKEN_MINT_ADDRESS;
 
 // Validate required environment variables
 if (!resourceWallet) {
@@ -277,20 +278,22 @@ if (!tokenMint) {
 export const middleware = paymentMiddleware(
   resourceWallet,
   {
-    // Mint route: Pay with USDC, receive TOKEN
+    // Mint route: Pay with USDC, receive TOKEN (dynamic amount, $1 minimum)
     "/api/mint": {
-      price: "$1", // Minimum $1 payment in USDC
+      price: "$1", // Minimum $1 payment in USDC, actual amount from request
       network,
       config: {
         description: "Mint tokens by paying with USDC",
+        mimeType: "application/json",
       },
     },
-    // Donate route: Pay with TOKEN, write to community board
+    // Donate route: Pay with TOKEN, write to community board (dynamic amount, 1 TOKEN minimum)
     "/api/write-message": {
-      price: `1 ${tokenMint}`, // Minimum 1 TOKEN payment
+      price: `1 ${tokenMint}`, // Minimum 1 TOKEN payment, actual amount from request
       network,
       config: {
         description: "Donate tokens and write to community board",
+        mimeType: "application/json",
       },
     },
     // Legacy routes for backwards compatibility (USDC payment, receive TOKEN)
