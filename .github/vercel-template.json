@@ -1,0 +1,99 @@
+{
+  "name": "X402 Token Donation Platform",
+  "description": "A Next.js template for creating a token donation platform with X402 payments. Users can mint tokens with USDC or donate tokens to write on a community board.",
+  "repository": "https://github.com/Mbdulrohim/x402-donation-with-token-template",
+  "demo": "https://x402-donation-template.vercel.app",
+  "tags": [
+    "nextjs",
+    "solana",
+    "web3",
+    "crypto",
+    "payments",
+    "x402",
+    "donation",
+    "token",
+    "spl-token"
+  ],
+  "categories": [
+    "Web3",
+    "Payments",
+    "Social"
+  ],
+  "env": [
+    {
+      "key": "DATABASE_URL",
+      "description": "Neon Postgres connection string",
+      "required": true
+    },
+    {
+      "key": "RESOURCE_SERVER_WALLET_ADDRESS",
+      "description": "Public key of wallet that receives payments",
+      "required": true
+    },
+    {
+      "key": "RESOURCE_SERVER_KEYPAIR",
+      "description": "Base58 encoded private key for token distribution",
+      "required": true
+    },
+    {
+      "key": "TOKEN_MINT",
+      "description": "SPL token mint address",
+      "required": true
+    },
+    {
+      "key": "TOKEN_NAME",
+      "description": "Name of your token",
+      "required": true
+    },
+    {
+      "key": "TOKEN_SYMBOL",
+      "description": "Token symbol (e.g., MTK)",
+      "required": true
+    },
+    {
+      "key": "TOKEN_IMAGE_URL",
+      "description": "URL to token logo image",
+      "required": true
+    },
+    {
+      "key": "TOKEN_DESCRIPTION",
+      "description": "Description of your token",
+      "required": true
+    },
+    {
+      "key": "TOTAL_SUPPLY",
+      "description": "Total token supply",
+      "required": true
+    },
+    {
+      "key": "MINTABLE_SUPPLY",
+      "description": "Amount available for distribution",
+      "required": true
+    },
+    {
+      "key": "DONATION_TARGET",
+      "description": "Target USD amount to raise",
+      "required": true
+    },
+    {
+      "key": "NEXT_PUBLIC_SOLANA_NETWORK",
+      "description": "Solana network (solana-devnet or solana)",
+      "required": true,
+      "default": "solana-devnet"
+    },
+    {
+      "key": "NEXT_PUBLIC_SOLANA_RPC_URL",
+      "description": "Solana RPC endpoint",
+      "required": true,
+      "default": "https://api.devnet.solana.com"
+    },
+    {
+      "key": "FACILITATOR_URL",
+      "description": "X402 payment facilitator URL",
+      "required": false,
+      "default": "https://facilitator.payai.network"
+    }
+  ],
+  "framework": "nextjs",
+  "css": "tailwind"
+}

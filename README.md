@@ -1,33 +1,39 @@
-# x402 Donation Template (No Token)
+# X402 Token Donation Platform
 
-A Next.js template for creating a paid community message board with x402 payment integration. Users can write messages by paying with $PAYAI tokens, with all contributions recorded on-chain and displayed on a community board.
+A Next.js template for creating a token donation platform powered by X402 payments on Solana.
 
-> **💡 Recommended**: Deploy this template via the [x402 Merchant Launcher](https://github.com/postmanode/x402-merchant-launcher) by selecting "No Token (Donations Only)" option for automatic configuration and one-click setup.
-
-> **🪙 Looking for the token version?** Check out [x402-donation-with-token-template](https://github.com/PayAINetwork/x402-donation-with-token-template) to mint and distribute your own tokens.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMbdulrohim%2Fx402-donation-with-token-template)
 
 ## 📖 Overview
 
 ### What is this?
 
-This is a **paid community message board** that allows supporters to leave messages on your project's wall by paying with $PAYAI tokens. Think of it as a combination of:
+This is a **dual-purpose token platform** that allows users to:
 
-- 💬 **Paid Guestbook** - Community members pay to leave messages
-- 📊 **Public Board** - All messages displayed in real-time
-- 🔐 **Payment Processor** - Seamless crypto payments via x402
-- 📈 **Stats Dashboard** - Track total contributors and messages
+1. **Mint tokens** by paying with USDC
+2. **Donate tokens** to write messages on a community board
+
+Think of it as a combination of:
+
+- 💰 **Token Minting** - Users buy your token with USDC
+- 🎁 **Token Donations** - Users donate tokens to support your project
+- 💬 **Community Board** - Display donor messages and contributions
+- 🔐 **Secure Payments** - Automated payment processing via X402
+- 📈 **Stats Dashboard** - Track donations, amounts, and token distribution
 
 ### How it works
 
-1. **Project Creator** (you) uses [x402 Merchant Launcher](https://github.com/postmanode/x402-merchant-launcher) and selects "No Token" option
-2. **Merchant Server** goes live on Vercel and is automatically discoverable on [x402scan.com](https://x402scan.com)
-3. **Community Members** visit your message board and write messages by paying with $PAYAI
-4. **Community Board** displays all messages and contributor names in real-time
+1. **Mint Tab**: Users pay USDC → receive your TOKEN
+2. **Donate Tab**: Users pay TOKEN → write message on community board
+3. **Community Board**: Displays all donations with names and messages
+4. **Stats**: Real-time tracking of total donors, amounts, and tokens
 
-### Why use this?
+### Features
 
-- ✅ **No token creation needed** - Use existing $PAYAI token
-- ✅ **Simple setup** - Just project name and description
+- ✅ **Two revenue streams** - Sell tokens & accept donations
+- ✅ **Automated payments** - X402 handles all payment processing
+- ✅ **Community engagement** - Public message board
+- ✅ **Real-time stats** - Track your progress
 - ✅ **x402 protocol compliant** - Auto-discoverable, standard payments
 - ✅ **Community engagement** - Let supporters share their thoughts
 - ✅ **Zero maintenance** - Serverless architecture, auto-scaling
@@ -180,6 +186,7 @@ This template connects to **Vercel Storage (Neon Postgres)** both locally and in
    - Go to [vercel.com/new](https://vercel.com/new)
    - Import your GitHub repository
    - Configure environment variables
+
 3. **Deploy x402 schema:**
    - Your site is now live at `your-project.vercel.app`
    - x402 schema accessible at `your-project.vercel.app/.well-known/x402.json`
