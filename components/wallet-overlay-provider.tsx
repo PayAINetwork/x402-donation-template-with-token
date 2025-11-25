@@ -151,14 +151,35 @@ function WalletSelectionOverlay({
               const adapterName = walletOption.adapter.name as WalletName;
               const isActive =
                 wallet?.adapter.name === adapterName && connected;
+              const isPendingOrConnecting =
+                !isActive && (connecting || pendingWallet === adapterName);
+
+              const onRowAction = () =>
+                isActive
+                  ? void disconnect().then(onClose)
+                  : handleConnect(adapterName);
+
               return (
                 <div
                   key={adapterName}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    if (isPendingOrConnecting) return;
+                    onRowAction();
+                  }}
+                  onKeyDown={(e) => {
+                    if (isPendingOrConnecting) return;
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onRowAction();
+                    }
+                  }}
                   className={`flex items-center justify-between pb-4 ${
                     index !== visibleWallets.length - 1
                       ? "border-b border-white/10"
                       : ""
-                  }`}
+                  } ${isPendingOrConnecting ? "cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/5">
@@ -187,19 +208,16 @@ function WalletSelectionOverlay({
                   </div>
                   <button
                     type="button"
-                    disabled={
-                      !isActive && (connecting || pendingWallet === adapterName)
-                    }
-                    onClick={() =>
-                      isActive
-                        ? void disconnect().then(onClose)
-                        : handleConnect(adapterName)
-                    }
+                    disabled={isPendingOrConnecting}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRowAction();
+                    }}
                     className="rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isActive
                       ? "Disconnect"
-                      : pendingWallet === adapterName || connecting
+                      : isPendingOrConnecting
                       ? "Connecting..."
                       : "Connect"}
                   </button>
