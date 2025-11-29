@@ -22,14 +22,14 @@ export interface TokenConfig {
  * Get token configuration from environment variables
  */
 export function getTokenConfig(): TokenConfig {
-  const mint = process.env.TOKEN_MINT;
-  const name = process.env.TOKEN_NAME;
-  const symbol = process.env.TOKEN_SYMBOL;
+  const mint = process.env.NEXT_PUBLIC_TOKEN_MINT;
+  const name = process.env.NEXT_PUBLIC_TOKEN_NAME;
+  const symbol = process.env.NEXT_PUBLIC_TOKEN_SYMBOL;
   const totalSupply = process.env.TOTAL_SUPPLY;
-  const mintableSupply = process.env.MINTABLE_SUPPLY;
-  const imageUrl = process.env.TOKEN_IMAGE_URL;
-  const description = process.env.TOKEN_DESCRIPTION;
-  const donationTarget = process.env.DONATION_TARGET;
+  const mintableSupply = process.env.NEXT_PUBLIC_MINTABLE_SUPPLY;
+  const imageUrl = process.env.NEXT_PUBLIC_TOKEN_IMAGE_URL;
+  const description = process.env.NEXT_PUBLIC_PROJECT_DESCRIPTION;
+  const donationTarget = process.env.NEXT_PUBLIC_DONATION_TARGET;
 
   if (
     !mint ||
@@ -73,7 +73,7 @@ export function calculateTokensForDonation(
 
 /**
  * Transfer tokens from resource server wallet to recipient
- * 
+ *
  * @param recipientAddress - Recipient's wallet address
  * @param amount - Amount of tokens to transfer (in token units, not smallest units)
  * @returns Transaction signature
@@ -132,4 +132,3 @@ export async function transferTokens(
 
   return signature;
 }
-

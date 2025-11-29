@@ -12,18 +12,15 @@ const inter = Inter({
 
 const tokenName =
   process.env.NEXT_PUBLIC_TOKEN_NAME || process.env.TOKEN_NAME || "Token";
-const tokenSymbol =
-  process.env.NEXT_PUBLIC_TOKEN_SYMBOL || process.env.TOKEN_SYMBOL || "TOKEN";
-const tokenDescription =
-  process.env.NEXT_PUBLIC_TOKEN_DESCRIPTION ||
-  process.env.TOKEN_DESCRIPTION ||
+const tokenSymbol = process.env.NEXT_PUBLIC_TOKEN_SYMBOL || "TOKEN";
+const projectDescription =
+  process.env.NEXT_PUBLIC_PROJECT_DESCRIPTION ||
   `Support our community and receive ${tokenSymbol} tokens`;
-const tokenImage =
-  process.env.NEXT_PUBLIC_TOKEN_IMAGE_URL || process.env.TOKEN_IMAGE_URL;
+const tokenImage = process.env.NEXT_PUBLIC_TOKEN_IMAGE_URL;
 
 export const metadata: Metadata = {
-  title: `${tokenName} (${tokenSymbol}) - Community Donation Portal`,
-  description: tokenDescription,
+  title: `${tokenName} (${tokenSymbol}) - x402 Donations!`,
+  description: projectDescription,
   keywords: [
     tokenName,
     tokenSymbol,
@@ -42,15 +39,15 @@ export const metadata: Metadata = {
       }
     : undefined,
   openGraph: {
-    title: `${tokenName} (${tokenSymbol}) - Community Donation Portal`,
-    description: tokenDescription,
+    title: `${tokenName} (${tokenSymbol}) - x402 Donations!`,
+    description: projectDescription,
     images: tokenImage ? [{ url: tokenImage, alt: `${tokenName} Logo` }] : [],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${tokenName} (${tokenSymbol}) - Community Donation Portal`,
-    description: tokenDescription,
+    title: `${tokenName} (${tokenSymbol}) - x402 Donations!`,
+    description: projectDescription,
     images: tokenImage ? [tokenImage] : [],
   },
   robots: {

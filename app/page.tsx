@@ -73,6 +73,9 @@ export default function Home() {
     totalAmount: 0,
     totalTokens: 0,
   });
+  const [biggestDonor, setBiggestDonor] = useState<DonationMessage | null>(
+    null
+  );
   const [usdcBalance, setUsdcBalance] = useState<number>(0);
   const [tokenBalance, setTokenBalance] = useState<number>(0);
   const [sliderPercentage, setSliderPercentage] = useState<number>(10);
@@ -81,14 +84,12 @@ export default function Home() {
   const [donorMessage, setDonorMessage] = useState("");
   const [sortBy, setSortBy] = useState<"recent" | "top">("recent");
   const [donationResult, setDonationResult] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"donate" | "mint">("donate");
+  const [activeTab, setActiveTab] = useState<"post" | "donate">("post");
   const [mintAmount, setMintAmount] = useState("1");
   const [selectedQuickAmount, setSelectedQuickAmount] = useState<string | null>(
     null
   );
-  const [donateWithToken, setDonateWithToken] = useState<"TOKEN" | "USDC">(
-    "TOKEN"
-  );
+  const [donateWithToken, setDonateWithToken] = useState<"TOKEN">("TOKEN");
   const [solPrice, setSolPrice] = useState<number>(0);
   const [usdcPrice, setUsdcPrice] = useState<number>(1);
 
@@ -97,7 +98,7 @@ export default function Home() {
   const tokenSymbol = process.env.NEXT_PUBLIC_TOKEN_SYMBOL || "TOKEN";
   const tokenImage = process.env.NEXT_PUBLIC_TOKEN_IMAGE_URL;
   const tokenDescription =
-    process.env.NEXT_PUBLIC_TOKEN_DESCRIPTION || "Support our community!";
+    process.env.NEXT_PUBLIC_PROJECT_DESCRIPTION || "Support our community!";
   const mintableSupply = parseInt(
     process.env.NEXT_PUBLIC_MINTABLE_SUPPLY || "1000000"
   );
@@ -240,6 +241,15 @@ export default function Home() {
         const data: MessagesResponse = await response.json();
         setMessages(data.data.donations);
         setStats(data.data.stats);
+        // Find biggest donor
+        if (data.data.donations.length > 0) {
+          const biggest = data.data.donations.reduce((prev, current) =>
+            prev.amount_usd > current.amount_usd ? prev : current
+          );
+          setBiggestDonor(biggest);
+        } else {
+          setBiggestDonor(null);
+        }
       }
     } catch (err) {
       console.error("Failed to fetch messages:", err);
@@ -248,15 +258,11 @@ export default function Home() {
 
   // Calculate amount based on slider percentage
   useEffect(() => {
-    const balance = donateWithToken === "USDC" ? usdcBalance : tokenBalance;
+    const balance = tokenBalance;
     const calculatedAmount = (balance * sliderPercentage) / 100;
 
-    if (donateWithToken === "USDC") {
-      setCustomAmount(calculatedAmount.toFixed(2));
-    } else {
-      setCustomAmount(Math.max(0, Math.floor(calculatedAmount)).toString());
-    }
-  }, [sliderPercentage, usdcBalance, tokenBalance, donateWithToken]);
+    setCustomAmount(Math.max(0, Math.floor(calculatedAmount)).toString());
+  }, [sliderPercentage, tokenBalance]);
 
   const handleSliderChange = (percentage: number) => {
     setSliderPercentage(percentage);
@@ -519,7 +525,30 @@ export default function Home() {
                         color: theme === "dark" ? "#FFFFFF" : "#09090B",
                       }}
                     >
-                      ${stats.totalAmount.toFixed(2)}
+                      ${stats.totalAmount.toFixed(2)} / ${donationTarget}
+                    </div>
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "8px",
+                        backgroundColor:
+                          theme === "dark"
+                            ? "rgba(255, 255, 255, 0.16)"
+                            : "#E4E4E7",
+                        borderRadius: "4px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${Math.min(
+                            (stats.totalAmount / donationTarget) * 100,
+                            100
+                          )}%`,
+                          height: "100%",
+                          backgroundColor: "#10B981", // green
+                        }}
+                      />
                     </div>
                     <div
                       style={{
@@ -533,7 +562,7 @@ export default function Home() {
                             : "#09090B",
                       }}
                     >
-                      Total Donated
+                      Donation Progress
                     </div>
                   </div>
                 </div>
@@ -567,7 +596,31 @@ export default function Home() {
                         color: theme === "dark" ? "#FFFFFF" : "#09090B",
                       }}
                     >
-                      {stats.totalTokens.toLocaleString()}
+                      {stats.totalTokens.toLocaleString()} /{" "}
+                      {mintableSupply.toLocaleString()}
+                    </div>
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "8px",
+                        backgroundColor:
+                          theme === "dark"
+                            ? "rgba(255, 255, 255, 0.16)"
+                            : "#E4E4E7",
+                        borderRadius: "4px",
+                        overflow: "hidden",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: `${Math.min(
+                            (stats.totalTokens / mintableSupply) * 100,
+                            100
+                          )}%`,
+                          height: "100%",
+                          backgroundColor: "#3B82F6", // blue
+                        }}
+                      />
                     </div>
                     <div
                       style={{
@@ -582,6 +635,21 @@ export default function Home() {
                       }}
                     >
                       Tokens Distributed
+                    </div>
+                    <div
+                      style={{
+                        fontWeight: 400,
+                        fontSize: "10px",
+                        lineHeight: "14px",
+                        textAlign: "center",
+                        color:
+                          theme === "dark"
+                            ? "rgba(255, 255, 255, 0.5)"
+                            : "#71717A",
+                      }}
+                    >
+                      Remaining:{" "}
+                      {(mintableSupply - stats.totalTokens).toLocaleString()}
                     </div>
                   </div>
                   <div
@@ -613,7 +681,13 @@ export default function Home() {
                         color: theme === "dark" ? "#FFFFFF" : "#09090B",
                       }}
                     >
-                      {(mintableSupply - stats.totalTokens).toLocaleString()}
+                      {biggestDonor
+                        ? biggestDonor.donor_name ||
+                          `${biggestDonor.donor_address.slice(
+                            0,
+                            4
+                          )}...${biggestDonor.donor_address.slice(-4)}`
+                        : "None"}
                     </div>
                     <div
                       style={{
@@ -627,7 +701,7 @@ export default function Home() {
                             : "#09090B",
                       }}
                     >
-                      Tokens Remaining
+                      Biggest Donor
                     </div>
                   </div>
                 </div>
@@ -790,6 +864,43 @@ export default function Home() {
                   >
                     {sliderPercentage}% of your {sliderBalanceLabel}
                   </div>
+                </div>
+
+                {/* Custom Amount Input */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "8px",
+                  }}
+                >
+                  <label
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      color: theme === "dark" ? "#FFFFFF" : "#09090B",
+                    }}
+                  >
+                    Or enter custom amount:
+                  </label>
+                  <Input
+                    type="number"
+                    value={customAmount}
+                    onChange={(e) => setCustomAmount(e.target.value)}
+                    placeholder="Enter token amount"
+                    min="0"
+                    style={{
+                      color: theme === "dark" ? "#FFFFFF" : "#09090B",
+                      background:
+                        theme === "dark"
+                          ? "rgba(255, 255, 255, 0.06)"
+                          : "rgba(0, 0, 0, 0.06)",
+                      border:
+                        theme === "dark"
+                          ? "1px solid rgba(255, 255, 255, 0.16)"
+                          : "1px solid rgba(0, 0, 0, 0.16)",
+                    }}
+                  />
                 </div>
               </div>
 
@@ -1280,7 +1391,7 @@ export default function Home() {
                 }}
               />
 
-              {/* Donated Amount */}
+              {/* Donation Progress */}
               <div
                 style={{
                   display: "flex",
@@ -1296,7 +1407,30 @@ export default function Home() {
                     color: theme === "dark" ? "#FFFFFF" : "#09090B",
                   }}
                 >
-                  ${stats.totalAmount.toFixed(2)}
+                  ${stats.totalAmount.toFixed(2)} / ${donationTarget}
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "6px",
+                    backgroundColor:
+                      theme === "dark"
+                        ? "rgba(255, 255, 255, 0.16)"
+                        : "#E4E4E7",
+                    borderRadius: "3px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${Math.min(
+                        (stats.totalAmount / donationTarget) * 100,
+                        100
+                      )}%`,
+                      height: "100%",
+                      backgroundColor: "#10B981",
+                    }}
+                  />
                 </div>
                 <div
                   style={{
@@ -1304,7 +1438,7 @@ export default function Home() {
                       theme === "dark" ? "rgba(255, 255, 255, 0.7)" : "#71717A",
                   }}
                 >
-                  Total Donated
+                  Donation Progress
                 </div>
               </div>
 
@@ -1318,7 +1452,7 @@ export default function Home() {
                 }}
               />
 
-              {/* Distribution Amount */}
+              {/* Tokens Distributed */}
               <div
                 style={{
                   display: "flex",
@@ -1334,7 +1468,31 @@ export default function Home() {
                     color: theme === "dark" ? "#FFFFFF" : "#09090B",
                   }}
                 >
-                  {stats.totalTokens.toLocaleString()}
+                  {stats.totalTokens.toLocaleString()} /{" "}
+                  {mintableSupply.toLocaleString()}
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "6px",
+                    backgroundColor:
+                      theme === "dark"
+                        ? "rgba(255, 255, 255, 0.16)"
+                        : "#E4E4E7",
+                    borderRadius: "3px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: `${Math.min(
+                        (stats.totalTokens / mintableSupply) * 100,
+                        100
+                      )}%`,
+                      height: "100%",
+                      backgroundColor: "#3B82F6",
+                    }}
+                  />
                 </div>
                 <div
                   style={{
@@ -1344,6 +1502,16 @@ export default function Home() {
                 >
                   Tokens Distributed
                 </div>
+                <div
+                  style={{
+                    fontSize: "10px",
+                    color:
+                      theme === "dark" ? "rgba(255, 255, 255, 0.5)" : "#A1A1AA",
+                  }}
+                >
+                  Remaining:{" "}
+                  {(mintableSupply - stats.totalTokens).toLocaleString()}
+                </div>
               </div>
 
               {/* Divider */}
@@ -1356,7 +1524,7 @@ export default function Home() {
                 }}
               />
 
-              {/* Remaining Amount */}
+              {/* Biggest Donor */}
               <div
                 style={{
                   display: "flex",
@@ -1372,7 +1540,13 @@ export default function Home() {
                     color: theme === "dark" ? "#FFFFFF" : "#09090B",
                   }}
                 >
-                  {(mintableSupply - stats.totalTokens).toLocaleString()}
+                  {biggestDonor
+                    ? biggestDonor.donor_name ||
+                      `${biggestDonor.donor_address.slice(
+                        0,
+                        4
+                      )}...${biggestDonor.donor_address.slice(-4)}`
+                    : "None"}
                 </div>
                 <div
                   style={{
@@ -1380,7 +1554,7 @@ export default function Home() {
                       theme === "dark" ? "rgba(255, 255, 255, 0.7)" : "#71717A",
                   }}
                 >
-                  Tokens Remaining
+                  Biggest Donor
                 </div>
               </div>
             </div>
@@ -1577,6 +1751,30 @@ export default function Home() {
         >
           <div className="container mx-auto px-4 flex w-full">
             <button
+              onClick={() => setActiveTab("post")}
+              className="flex-1 py-3 text-sm font-medium transition-colors relative"
+              style={{
+                color:
+                  activeTab === "post"
+                    ? theme === "dark"
+                      ? "rgba(255, 255, 255, 1)"
+                      : "rgba(9, 9, 11, 1)"
+                    : theme === "dark"
+                    ? "rgba(156, 163, 175, 1)"
+                    : "rgba(113, 113, 122, 1)",
+              }}
+            >
+              Post
+              {activeTab === "post" && (
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-0.5"
+                  style={{
+                    background: "linear-gradient(to right, #744AC9, #22EBAD)",
+                  }}
+                />
+              )}
+            </button>
+            <button
               onClick={() => setActiveTab("donate")}
               className="flex-1 py-3 text-sm font-medium transition-colors relative"
               style={{
@@ -1592,30 +1790,6 @@ export default function Home() {
             >
               Donate
               {activeTab === "donate" && (
-                <div
-                  className="absolute bottom-0 left-0 right-0 h-0.5"
-                  style={{
-                    background: "linear-gradient(to right, #744AC9, #22EBAD)",
-                  }}
-                />
-              )}
-            </button>
-            <button
-              onClick={() => setActiveTab("mint")}
-              className="flex-1 py-3 text-sm font-medium transition-colors relative"
-              style={{
-                color:
-                  activeTab === "mint"
-                    ? theme === "dark"
-                      ? "rgba(255, 255, 255, 1)"
-                      : "rgba(9, 9, 11, 1)"
-                    : theme === "dark"
-                    ? "rgba(156, 163, 175, 1)"
-                    : "rgba(113, 113, 122, 1)",
-              }}
-            >
-              Mint
-              {activeTab === "mint" && (
                 <div
                   className="absolute bottom-0 left-0 right-0 h-0.5"
                   style={{
@@ -1681,7 +1855,7 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {activeTab === "donate" ? (
+              {activeTab === "post" ? (
                 <>
                   {/* Connected Wallet Section */}
                   <div
@@ -1764,14 +1938,11 @@ export default function Home() {
 
                     {/* Donate With Token Selector */}
                     <div className="flex gap-2 mb-3">
-                      {[
-                        { value: "TOKEN", label: tokenSymbol },
-                        { value: "USDC", label: "USDC" },
-                      ].map((token) => (
+                      {[{ value: "TOKEN", label: tokenSymbol }].map((token) => (
                         <button
                           key={token.value}
                           onClick={() =>
-                            setDonateWithToken(token.value as "TOKEN" | "USDC")
+                            setDonateWithToken(token.value as "TOKEN")
                           }
                           className="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors"
                           style={{
@@ -1931,6 +2102,43 @@ export default function Home() {
                         >
                           {sliderPercentage}% of your {sliderBalanceLabel}
                         </div>
+                      </div>
+
+                      {/* Custom Amount Input */}
+                      <div
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          gap: "8px",
+                        }}
+                      >
+                        <label
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: 500,
+                            color: theme === "dark" ? "#FFFFFF" : "#09090B",
+                          }}
+                        >
+                          Or enter custom amount:
+                        </label>
+                        <Input
+                          type="number"
+                          value={customAmount}
+                          onChange={(e) => setCustomAmount(e.target.value)}
+                          placeholder="Enter token amount"
+                          min="0"
+                          style={{
+                            color: theme === "dark" ? "#FFFFFF" : "#09090B",
+                            background:
+                              theme === "dark"
+                                ? "rgba(255, 255, 255, 0.06)"
+                                : "rgba(0, 0, 0, 0.06)",
+                            border:
+                              theme === "dark"
+                                ? "1px solid rgba(255, 255, 255, 0.16)"
+                                : "1px solid rgba(0, 0, 0, 0.16)",
+                          }}
+                        />
                       </div>
                     </div>
 
@@ -2255,7 +2463,7 @@ export default function Home() {
 
                       {/* Quick Amount Buttons */}
                       <div className="flex flex-row gap-2">
-                        {["$1", "$5", "$10", "$50", "$100"].map((amount) => (
+                        {["$1", "$5", "$10", "$50"].map((amount) => (
                           <button
                             key={amount}
                             onClick={() => {
@@ -2472,7 +2680,7 @@ export default function Home() {
                                 : "rgba(113, 113, 122, 1)",
                           }}
                         >
-                          Exchange Rate
+                          Reward Rate
                         </span>
                         <span
                           className="font-medium"
@@ -2514,9 +2722,7 @@ export default function Home() {
                           Minting...
                         </>
                       ) : (
-                        `Mint ${(
-                          parseFloat(mintAmount || "0") * dollarToTokenRatio
-                        ).toLocaleString()} ${tokenSymbol}`
+                        `Donate ${mintAmount} USDC`
                       )}
                     </Button>
 
