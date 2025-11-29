@@ -36,43 +36,8 @@
       "required": true
     },
     {
-      "key": "TOKEN_MINT",
-      "description": "SPL token mint address",
-      "required": true
-    },
-    {
-      "key": "TOKEN_NAME",
-      "description": "Name of your token",
-      "required": true
-    },
-    {
-      "key": "TOKEN_SYMBOL",
-      "description": "Token symbol (e.g., MTK)",
-      "required": true
-    },
-    {
-      "key": "TOKEN_IMAGE_URL",
-      "description": "URL to token logo image",
-      "required": true
-    },
-    {
-      "key": "TOKEN_DESCRIPTION",
-      "description": "Description of your token",
-      "required": true
-    },
-    {
       "key": "TOTAL_SUPPLY",
       "description": "Total token supply",
-      "required": true
-    },
-    {
-      "key": "MINTABLE_SUPPLY",
-      "description": "Amount available for distribution",
-      "required": true
-    },
-    {
-      "key": "DONATION_TARGET",
-      "description": "Target USD amount to raise",
       "required": true
     },
     {
@@ -86,6 +51,11 @@
       "description": "Solana RPC endpoint",
       "required": true,
       "default": "https://api.devnet.solana.com"
+    },
+    {
+      "key": "NEXT_PUBLIC_PROJECT_DESCRIPTION",
+      "description": "Description of your project",
+      "required": true
     },
     {
       "key": "FACILITATOR_URL",

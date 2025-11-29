@@ -259,7 +259,8 @@ const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || "solana-devnet") as
   | "solana-devnet";
 const resourceWallet = process.env.RESOURCE_SERVER_WALLET_ADDRESS;
 const tokenMint =
-  process.env.TOKEN_MINT || process.env.NEXT_PUBLIC_TOKEN_MINT_ADDRESS;
+  process.env.NEXT_PUBLIC_TOKEN_MINT ||
+  process.env.NEXT_PUBLIC_TOKEN_MINT_ADDRESS;
 
 // Validate required environment variables
 if (!resourceWallet) {
