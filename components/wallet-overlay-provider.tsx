@@ -6,6 +6,7 @@ import {
   useContext,
   useMemo,
   useState,
+  useEffect,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
@@ -129,8 +130,26 @@ function WalletSelectionOverlay({
     return null;
   }
 
+  // Close on Escape key
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg px-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-lg px-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
       <div className="relative w-full max-w-[500px] min-h-[348px] rounded-[24px] border-2 border-white/10 bg-[#171719]/90 p-6 shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
         <button
           type="button"
@@ -151,14 +170,35 @@ function WalletSelectionOverlay({
               const adapterName = walletOption.adapter.name as WalletName;
               const isActive =
                 wallet?.adapter.name === adapterName && connected;
+              const isPendingOrConnecting =
+                !isActive && (connecting || pendingWallet === adapterName);
+
+              const onRowAction = () =>
+                isActive
+                  ? void disconnect().then(onClose)
+                  : handleConnect(adapterName);
+
               return (
                 <div
                   key={adapterName}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    if (isPendingOrConnecting) return;
+                    onRowAction();
+                  }}
+                  onKeyDown={(e) => {
+                    if (isPendingOrConnecting) return;
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      onRowAction();
+                    }
+                  }}
                   className={`flex items-center justify-between pb-4 ${
                     index !== visibleWallets.length - 1
                       ? "border-b border-white/10"
                       : ""
-                  }`}
+                  } ${isPendingOrConnecting ? "cursor-not-allowed" : "cursor-pointer"}`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/5">
@@ -187,19 +227,16 @@ function WalletSelectionOverlay({
                   </div>
                   <button
                     type="button"
-                    disabled={
-                      !isActive && (connecting || pendingWallet === adapterName)
-                    }
-                    onClick={() =>
-                      isActive
-                        ? void disconnect().then(onClose)
-                        : handleConnect(adapterName)
-                    }
+                    disabled={isPendingOrConnecting}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRowAction();
+                    }}
                     className="rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-sm font-medium text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {isActive
                       ? "Disconnect"
-                      : pendingWallet === adapterName || connecting
+                      : isPendingOrConnecting
                       ? "Connecting..."
                       : "Connect"}
                   </button>
