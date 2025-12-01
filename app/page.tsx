@@ -15,6 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useX402Payment } from "@/hooks/use-x402-payment";
 import {
   getSolPrice,
@@ -92,6 +99,10 @@ export default function Home() {
   const [donateWithToken, setDonateWithToken] = useState<"TOKEN">("TOKEN");
   const [solPrice, setSolPrice] = useState<number>(0);
   const [usdcPrice, setUsdcPrice] = useState<number>(1);
+  const [mintSuccessDialog, setMintSuccessDialog] = useState<{
+    open: boolean;
+    tokensMinted: number;
+  }>({ open: false, tokensMinted: 0 });
 
   // Token config from env
   const tokenName = process.env.NEXT_PUBLIC_TOKEN_NAME || "Token";
@@ -309,11 +320,10 @@ export default function Home() {
       });
       if (result) {
         const mintData = result as any;
-        alert(
-          `Mint successful! You received ${
-            mintData.data?.tokensMinted || 0
-          } ${tokenSymbol}`
-        );
+        setMintSuccessDialog({
+          open: true,
+          tokensMinted: mintData.data?.tokensMinted || 0,
+        });
         setMintAmount("1");
         setSelectedQuickAmount(null);
       }
@@ -341,12 +351,13 @@ export default function Home() {
   }
 
   return (
-    <main
-      className="h-screen flex flex-col md:flex-row overflow-hidden"
-      style={{
-        background: theme === "dark" ? "#000000" : "#FFFFFF",
-      }}
-    >
+    <>
+      <main
+        className="h-screen flex flex-col md:flex-row overflow-hidden"
+        style={{
+          background: theme === "dark" ? "#000000" : "#FFFFFF",
+        }}
+      >
       {/* Mobile Layout */}
       <div className="flex md:hidden flex-col h-full overflow-y-auto">
         {/* Mobile Header */}
@@ -2745,5 +2756,33 @@ export default function Home() {
         </div>
       </div>
     </main>
+
+    {/* Mint Success Dialog */}
+    <Dialog
+      open={mintSuccessDialog.open}
+      onOpenChange={(open) =>
+        setMintSuccessDialog({ ...mintSuccessDialog, open })
+      }
+    >
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle className="text-center text-2xl font-bold text-green-600">
+            🎉 Mint Successful!
+          </DialogTitle>
+          <DialogDescription className="text-center text-lg">
+            You received <span className="font-bold text-primary">{mintSuccessDialog.tokensMinted.toLocaleString()}</span> {tokenSymbol}
+          </DialogDescription>
+        </DialogHeader>
+        <div className="flex justify-center mt-4">
+          <Button
+            onClick={() => setMintSuccessDialog({ open: false, tokensMinted: 0 })}
+            className="bg-gradient-to-r from-purple-500 to-teal-500 hover:from-purple-600 hover:to-teal-600 text-white"
+          >
+            Continue
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

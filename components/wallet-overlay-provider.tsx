@@ -112,6 +112,19 @@ function WalletSelectionOverlay({
   };
 
   const handleConnect = async (walletName: WalletName) => {
+    const walletToConnect = wallets.find((w) => w.adapter.name === walletName);
+    if (!walletToConnect) {
+      throw new Error("Wallet not found");
+    }
+    if (walletToConnect.readyState === WalletReadyState.NotDetected) {
+      throw new Error(
+        "Wallet not detected. Please install the wallet extension."
+      );
+    }
+    if (walletToConnect.readyState !== WalletReadyState.Installed) {
+      throw new Error("Wallet not ready. Please try again.");
+    }
+
     try {
       setPendingWallet(walletName);
       setError(null);
@@ -126,11 +139,7 @@ function WalletSelectionOverlay({
     }
   };
 
-  if (!open || !isClient) {
-    return null;
-  }
-
-  // Close on Escape key
+  // Close on Escape key — always register the effect so hooks order is stable
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -140,6 +149,10 @@ function WalletSelectionOverlay({
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
+
+  if (!open || !isClient) {
+    return null;
+  }
 
   return createPortal(
     <div
@@ -184,11 +197,19 @@ function WalletSelectionOverlay({
                   role="button"
                   tabIndex={0}
                   onClick={() => {
-                    if (isPendingOrConnecting) return;
+                    if (
+                      isPendingOrConnecting ||
+                      walletOption.readyState === WalletReadyState.NotDetected
+                    )
+                      return;
                     onRowAction();
                   }}
                   onKeyDown={(e) => {
-                    if (isPendingOrConnecting) return;
+                    if (
+                      isPendingOrConnecting ||
+                      walletOption.readyState === WalletReadyState.NotDetected
+                    )
+                      return;
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
                       onRowAction();
@@ -198,7 +219,12 @@ function WalletSelectionOverlay({
                     index !== visibleWallets.length - 1
                       ? "border-b border-white/10"
                       : ""
-                  } ${isPendingOrConnecting ? "cursor-not-allowed" : "cursor-pointer"}`}
+                  } ${
+                    isPendingOrConnecting ||
+                    walletOption.readyState === WalletReadyState.NotDetected
+                      ? "cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative h-10 w-10 overflow-hidden rounded-full border border-white/10 bg-white/5">
@@ -227,7 +253,10 @@ function WalletSelectionOverlay({
                   </div>
                   <button
                     type="button"
-                    disabled={isPendingOrConnecting}
+                    disabled={
+                      isPendingOrConnecting ||
+                      walletOption.readyState === WalletReadyState.NotDetected
+                    }
                     onClick={(e) => {
                       e.stopPropagation();
                       onRowAction();
@@ -238,6 +267,8 @@ function WalletSelectionOverlay({
                       ? "Disconnect"
                       : isPendingOrConnecting
                       ? "Connecting..."
+                      : walletOption.readyState === WalletReadyState.NotDetected
+                      ? "Install"
                       : "Connect"}
                   </button>
                 </div>
