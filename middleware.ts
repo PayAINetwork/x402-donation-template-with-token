@@ -73,16 +73,18 @@ export function paymentMiddleware(
       // Parse amount from "1 TOKEN_MINT" string OR use dynamic amount
       const amount = dynamicAmount || parseFloat(price.split(" ")[0]);
 
-      // Assume 9 decimals for custom token
+      // Get decimals from env or default to 9
+      const decimals = parseInt(process.env.NEXT_PUBLIC_TOKEN_DECIMALS || "9");
+
       const atomicAmount = BigInt(
-        Math.floor(amount * 1_000_000_000)
+        Math.floor(amount * Math.pow(10, decimals))
       ).toString();
 
       atomicAmountForAsset = {
         maxAmountRequired: atomicAmount,
         asset: {
           address: tokenMint,
-          decimals: 9,
+          decimals: decimals,
         },
       };
     } else {
