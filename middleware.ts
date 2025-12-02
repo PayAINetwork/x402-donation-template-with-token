@@ -331,6 +331,25 @@ if (!tokenMint) {
   );
 }
 
+// Validate that the wallet address is not the same as the token mint
+if (resourceWallet === tokenMint) {
+  throw new Error(
+    "RESOURCE_SERVER_WALLET_ADDRESS cannot be the same as the Token Mint address. Please check your .env configuration."
+  );
+}
+
+// Validate that the wallet address is not the USDC mint (common configuration error)
+const USDC_MINT_DEVNET = "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU";
+const USDC_MINT_MAINNET = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+if (
+  resourceWallet === USDC_MINT_DEVNET ||
+  resourceWallet === USDC_MINT_MAINNET
+) {
+  throw new Error(
+    "RESOURCE_SERVER_WALLET_ADDRESS cannot be the USDC Mint address. Please use your merchant wallet address."
+  );
+}
+
 // Configure x402 middleware for protected routes
 export const middleware = paymentMiddleware(
   resourceWallet,

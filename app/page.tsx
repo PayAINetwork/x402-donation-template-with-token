@@ -1498,7 +1498,7 @@ export default function Home() {
                                 : "rgba(9, 9, 11, 1)",
                           }}
                         >
-                          You&apos;re paying (USDC)
+                          You&apos;re donating (USDC)
                         </label>
 
                         {/* Balance Display */}
