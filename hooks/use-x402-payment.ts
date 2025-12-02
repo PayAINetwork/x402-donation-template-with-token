@@ -41,8 +41,16 @@ export function useX402Payment() {
     setError(null);
 
     try {
+      // Append amount to URL query params if present in body
+      // This allows middleware to read the amount without parsing the body
+      let url = endpoint;
+      if (body && typeof body.amount === "number") {
+        const separator = url.includes("?") ? "&" : "?";
+        url = `${url}${separator}amount=${body.amount}`;
+      }
+
       // Call x402-protected endpoint with automatic payment handling
-      const response = await client.fetch(endpoint, {
+      const response = await client.fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

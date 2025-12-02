@@ -74,19 +74,8 @@ export function DonationSuccess({
                   : "rgba(9, 9, 11, 1)",
             }}
           >
-            Thank you for supporting us!
+            Thank you for the support!
           </h1>
-          <p
-            className="text-base"
-            style={{
-              color:
-                theme === "dark"
-                  ? "rgba(156, 163, 175, 1)"
-                  : "rgba(113, 113, 122, 1)",
-            }}
-          >
-            Your contribution helps us grow, create, and keep building together.
-          </p>
         </div>
 
         {/* Donation Details Card */}

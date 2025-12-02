@@ -14,6 +14,7 @@ export interface DonationMessage {
   amount_usd: number;
   tokens_amount: number;
   message: string | null;
+  transaction_signature: string | null;
   created_at: Date;
 }
 
@@ -50,6 +51,7 @@ export async function storeDonation(
       amount_usd: parseFloat(donation.amountUsd),
       tokens_amount: donation.tokensAmount,
       message: donation.message,
+      transaction_signature: donation.transactionSignature,
       created_at: donation.createdAt,
     };
   } catch (error) {
@@ -97,6 +99,7 @@ export async function getDonations(
       amount_usd: parseFloat(d.amountUsd),
       tokens_amount: d.tokensAmount,
       message: d.message,
+      transaction_signature: d.transactionSignature,
       created_at: d.createdAt,
     }));
 

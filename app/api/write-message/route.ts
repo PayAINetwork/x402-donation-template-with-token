@@ -34,11 +34,13 @@ export async function POST(request: NextRequest) {
     }
 
     let payerAddress: string;
+    let transactionSignature: string | undefined;
     try {
       const decoded = JSON.parse(
         Buffer.from(paymentResponse, "base64").toString()
       );
       payerAddress = decoded.payer;
+      transactionSignature = decoded.transaction;
     } catch {
       return NextResponse.json(
         { success: false, error: "Invalid payment response" },
@@ -72,7 +74,7 @@ export async function POST(request: NextRequest) {
       amount,
       name,
       message,
-      "" // No transaction signature needed since we're receiving, not sending
+      transactionSignature // Pass the transaction signature from payment response
     );
 
     return NextResponse.json({
@@ -87,6 +89,7 @@ export async function POST(request: NextRequest) {
         tokenSymbol: tokenConfig.symbol,
         name: name || null,
         message: message || null,
+        transactionSignature: transactionSignature || null,
       },
     });
   } catch (error) {

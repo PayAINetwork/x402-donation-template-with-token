@@ -7,6 +7,7 @@ interface DonationItemProps {
   amount_usd: number;
   tokens_amount: number;
   message: string | null;
+  transaction_signature: string | null;
   created_at: string;
   tokenSymbol: string;
   theme?: "dark" | "light";
@@ -17,6 +18,7 @@ export function DonationItem({
   amount_usd,
   tokens_amount,
   message,
+  transaction_signature,
   created_at,
   tokenSymbol,
   theme = "dark",
@@ -34,7 +36,7 @@ export function DonationItem({
   };
 
   const formatTokens = (tokens: number) => {
-    return tokens.toLocaleString().replace(/,/g, ".");
+    return tokens.toLocaleString();
   };
 
   const isAnonymous = !donor_name;
@@ -138,6 +140,22 @@ export function DonationItem({
             {formatTokens(tokens_amount)} {tokenSymbol}
           </span>
         </p>
+        {transaction_signature && (
+          <a
+            href={`https://solscan.io/tx/${transaction_signature}?cluster=devnet`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs hover:underline mt-1 block"
+            style={{
+              color:
+                theme === "dark"
+                  ? "rgba(156, 163, 175, 1)"
+                  : "rgba(113, 113, 122, 1)",
+            }}
+          >
+            View on Solscan ↗
+          </a>
+        )}
       </div>
     </div>
   );

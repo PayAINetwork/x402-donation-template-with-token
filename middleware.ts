@@ -61,8 +61,59 @@ export function paymentMiddleware(
       errorMessages,
     } = config;
 
-    const atomicAmountForAsset = processPriceToAtomicAmount(price, network);
+    let atomicAmountForAsset;
+
+    // Check for dynamic amount in query params
+    const queryAmount = request.nextUrl.searchParams.get("amount");
+    const dynamicAmount = queryAmount ? parseFloat(queryAmount) : null;
+
+    // Check if this is a custom token payment (contains tokenMint)
+    // Use global tokenMint variable defined at bottom of file
+    if (tokenMint && typeof price === "string" && price.includes(tokenMint)) {
+      // Parse amount from "1 TOKEN_MINT" string OR use dynamic amount
+      const amount = dynamicAmount || parseFloat(price.split(" ")[0]);
+
+      // Get decimals from env or default to 9
+      const decimals = parseInt(process.env.NEXT_PUBLIC_TOKEN_DECIMALS || "9");
+
+      const atomicAmount = BigInt(
+        Math.floor(amount * Math.pow(10, decimals))
+      ).toString();
+
+      atomicAmountForAsset = {
+        maxAmountRequired: atomicAmount,
+        asset: {
+          address: tokenMint,
+          decimals: decimals,
+        },
+      };
+    } else {
+      // Default behavior for USDC/SOL
+      // If dynamic amount is present, construct a new price string
+      const effectivePrice = dynamicAmount ? `${dynamicAmount}` : price;
+      atomicAmountForAsset = processPriceToAtomicAmount(
+        effectivePrice,
+        network
+      );
+    }
+
+    console.log("[x402] Middleware Config:", {
+      tokenMint,
+      priceString: price,
+      network,
+    });
+    console.log("[x402] Price calculation:", {
+      route: pathname,
+      priceConfig: price,
+      network,
+      result: atomicAmountForAsset,
+    });
+
     if ("error" in atomicAmountForAsset) {
+      console.error(
+        "[x402] Price calculation error:",
+        atomicAmountForAsset.error
+      );
       return new NextResponse(atomicAmountForAsset.error, { status: 500 });
     }
     const { maxAmountRequired, asset } = atomicAmountForAsset;
@@ -173,6 +224,11 @@ export function paymentMiddleware(
 
     // Settle payment first
     try {
+      console.log("[x402] Settling payment:", {
+        decodedPayment,
+        requirements: selectedPaymentRequirements,
+      });
+
       const settlement = await settle(
         decodedPayment,
         selectedPaymentRequirements

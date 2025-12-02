@@ -4,6 +4,7 @@ import "./globals.css";
 import { SolanaWalletProvider } from "@/components/wallet-provider";
 import { Providers } from "@/components/providers";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -19,7 +20,7 @@ const projectDescription =
 const tokenImage = process.env.NEXT_PUBLIC_TOKEN_IMAGE_URL;
 
 export const metadata: Metadata = {
-  title: `${tokenName} (${tokenSymbol}) - x402 Donations!`,
+  title: `(${tokenSymbol}) ${tokenName} - x402 Donations!`,
   description: projectDescription,
   keywords: [
     tokenName,
@@ -39,14 +40,14 @@ export const metadata: Metadata = {
       }
     : undefined,
   openGraph: {
-    title: `${tokenName} (${tokenSymbol}) - x402 Donations!`,
+    title: `(${tokenSymbol}) ${tokenName} - x402 Donations!`,
     description: projectDescription,
     images: tokenImage ? [{ url: tokenImage, alt: `${tokenName} Logo` }] : [],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${tokenName} (${tokenSymbol}) - x402 Donations!`,
+    title: `(${tokenSymbol}) ${tokenName} - x402 Donations!`,
     description: projectDescription,
     images: tokenImage ? [tokenImage] : [],
   },
@@ -69,6 +70,7 @@ export default function RootLayout({
             <ThemeToggle />
           </div>
           {children}
+          <Toaster />
         </Providers>
       </body>
     </html>
