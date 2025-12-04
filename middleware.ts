@@ -314,9 +314,7 @@ const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || "solana-devnet") as
   | "solana"
   | "solana-devnet";
 const resourceWallet = process.env.RESOURCE_SERVER_WALLET_ADDRESS;
-const tokenMint =
-  process.env.NEXT_PUBLIC_TOKEN_MINT ||
-  process.env.NEXT_PUBLIC_TOKEN_MINT_ADDRESS;
+const tokenMint = process.env.NEXT_PUBLIC_TOKEN_MINT;
 
 // Validate required environment variables
 if (!resourceWallet) {
@@ -326,9 +324,7 @@ if (!resourceWallet) {
 }
 
 if (!tokenMint) {
-  throw new Error(
-    "TOKEN_MINT or NEXT_PUBLIC_TOKEN_MINT_ADDRESS environment variable is required but not set"
-  );
+  throw new Error("TOKEN_MINT environment variable is required but not set");
 }
 
 // Configure x402 middleware for protected routes

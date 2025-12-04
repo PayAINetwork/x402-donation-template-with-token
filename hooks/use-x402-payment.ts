@@ -1,15 +1,26 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { createX402Client } from "x402-solana/client";
+import {
+  PublicKey,
+  Transaction,
+  SystemProgram,
+  LAMPORTS_PER_SOL,
+} from "@solana/web3.js";
+import {
+  createAssociatedTokenAccountInstruction,
+  getAssociatedTokenAddress,
+} from "@solana/spl-token";
 
 type PaymentRequestBody = Record<string, unknown>;
 
 export function useX402Payment() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { publicKey, signTransaction } = useWallet();
+  const { publicKey, signTransaction, sendTransaction } = useWallet();
+  const { connection } = useConnection();
 
   // Create x402 client with wallet adapter
   const client = useMemo(() => {
@@ -29,6 +40,49 @@ export function useX402Payment() {
     });
   }, [publicKey, signTransaction]);
 
+  const createMerchantATA = async () => {
+    if (!publicKey || !sendTransaction || !connection) {
+      throw new Error("Wallet not connected");
+    }
+
+    const merchantWalletAddress =
+      process.env.NEXT_PUBLIC_MERCHANT_WALLET_ADDRESS;
+    const tokenMintAddress = process.env.NEXT_PUBLIC_TOKEN_MINT;
+    if (!merchantWalletAddress || !tokenMintAddress) {
+      throw new Error(
+        "Missing merchant wallet or token mint configuration for ATA creation."
+      );
+    }
+
+    try {
+      const merchantPubkey = new PublicKey(merchantWalletAddress);
+      const mintPubkey = new PublicKey(tokenMintAddress);
+
+      const associatedTokenAddress = await getAssociatedTokenAddress(
+        mintPubkey,
+        merchantPubkey
+      );
+
+      const transaction = new Transaction().add(
+        createAssociatedTokenAccountInstruction(
+          publicKey, // payer
+          associatedTokenAddress,
+          merchantPubkey, // owner
+          mintPubkey
+        )
+      );
+
+      const signature = await sendTransaction(transaction, connection);
+      await connection.confirmTransaction(signature, "confirmed");
+      return true;
+    } catch (err) {
+      console.error("Failed to create merchant ATA:", err);
+      throw new Error(
+        "Failed to create merchant token account. Please try again."
+      );
+    }
+  };
+
   const initiatePayment = async <TResponse = unknown>(
     endpoint: string,
     body?: PaymentRequestBody
@@ -40,7 +94,7 @@ export function useX402Payment() {
     setIsProcessing(true);
     setError(null);
 
-    try {
+    const makeRequest = async () => {
       // Append amount to URL query params if present in body
       // This allows middleware to read the amount without parsing the body
       let url = endpoint;
@@ -71,12 +125,40 @@ export function useX402Payment() {
         throw new Error(errorMessage);
       }
 
-      const result = (await response.json()) as TResponse;
-      setIsProcessing(false);
-      return result;
+      return (await response.json()) as TResponse;
+    };
+
+    try {
+      return await makeRequest();
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Payment failed";
+
+      // Check for specific ATA error
+      // "Destination does not have an Associated Token Account"
+      if (
+        errorMessage.includes(
+          "Destination does not have an Associated Token Account"
+        )
+      ) {
+        try {
+          console.log(
+            "Detected missing ATA error. Attempting to create merchant ATA..."
+          );
+          await createMerchantATA();
+          console.log("Merchant ATA created. Retrying payment...");
+          const result = await makeRequest();
+          setIsProcessing(false);
+          return result;
+        } catch (retryErr) {
+          const retryErrorMessage =
+            retryErr instanceof Error ? retryErr.message : "Retry failed";
+          setError(retryErrorMessage);
+          setIsProcessing(false);
+          throw retryErr;
+        }
+      }
+
       setError(errorMessage);
       setIsProcessing(false);
       throw err;

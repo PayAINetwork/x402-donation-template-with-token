@@ -202,9 +202,7 @@ export default function Home() {
       return;
     }
 
-    const tokenMintAddress =
-      process.env.NEXT_PUBLIC_TOKEN_MINT_ADDRESS ||
-      process.env.NEXT_PUBLIC_TOKEN_MINT;
+    const tokenMintAddress = process.env.NEXT_PUBLIC_TOKEN_MINT;
 
     if (!tokenMintAddress) {
       setTokenBalance(0);
@@ -1498,7 +1496,7 @@ export default function Home() {
                                 : "rgba(9, 9, 11, 1)",
                           }}
                         >
-                          You&apos;re paying (USDC)
+                          You&apos;re donating (USDC)
                         </label>
 
                         {/* Balance Display */}
