@@ -16,7 +16,6 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletReadyState, type WalletName } from "@solana/wallet-adapter-base";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useIsClient } from "@/hooks/use-is-client";
-import { Button } from "@/components/ui/button";
 
 interface WalletOverlayContextValue {
   isOpen: boolean;

@@ -26,12 +26,12 @@
       "required": true
     },
     {
-      "key": "NEXT_PUBLIC_MERCHANT_WALLET_ADDRESS",
+      "key": "NEXT_PUBLIC_MERCHANT_ADDRESS",
       "description": "Public key of wallet that receives payments",
       "required": true
     },
     {
-      "key": "RESOURCE_SERVER_KEYPAIR",
+      "key": "MERCHANT_PRIVATE_KEY",
       "description": "Base58 encoded private key for token distribution",
       "required": true
     },

@@ -47,10 +47,10 @@ export function getConnection(): Connection {
  * @returns Resource server Keypair
  */
 export function getResourceWallet(): Keypair {
-  const privateKeyString = process.env.RESOURCE_SERVER_KEYPAIR;
+  const privateKeyString = process.env.MERCHANT_PRIVATE_KEY;
 
   if (!privateKeyString) {
-    throw new Error("RESOURCE_SERVER_KEYPAIR not configured");
+    throw new Error("MERCHANT_PRIVATE_KEY not configured");
   }
 
   try {
@@ -58,7 +58,7 @@ export function getResourceWallet(): Keypair {
     return Keypair.fromSecretKey(privateKeyBytes);
   } catch (error) {
     throw new Error(
-      `Invalid RESOURCE_SERVER_KEYPAIR: ${
+      `Invalid MERCHANT_PRIVATE_KEY: ${
         error instanceof Error ? error.message : "Unknown error"
       }`
     );
@@ -70,10 +70,10 @@ export function getResourceWallet(): Keypair {
  * @returns Resource server wallet address
  */
 export function getResourceWalletAddress(): string {
-  const address = process.env.NEXT_PUBLIC_MERCHANT_WALLET_ADDRESS;
+  const address = process.env.NEXT_PUBLIC_MERCHANT_ADDRESS;
 
   if (!address) {
-    throw new Error("NEXT_PUBLIC_MERCHANT_WALLET_ADDRESS not configured");
+    throw new Error("NEXT_PUBLIC_MERCHANT_ADDRESS not configured");
   }
 
   return address;
