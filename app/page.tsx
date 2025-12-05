@@ -1,20 +1,12 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { useWalletOverlay } from "@/components/wallet-overlay-provider";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -23,13 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useX402Payment } from "@/hooks/use-x402-payment";
-import {
-  getSolPrice,
-  getUsdcPrice,
-  calculateUsdValue,
-  formatPrice,
-} from "@/lib/price";
-import { Loader2, Send, TrendingUp, Users, Coins } from "lucide-react";
+
+import { Loader2 } from "lucide-react";
 import { PublicKey } from "@solana/web3.js";
 import type { ParsedAccountData } from "@solana/web3.js";
 import { useTheme } from "next-themes";
@@ -111,9 +98,9 @@ export default function Home() {
   const [selectedQuickAmount, setSelectedQuickAmount] = useState<string | null>(
     null
   );
-  const [donateWithToken, setDonateWithToken] = useState<"TOKEN">("TOKEN");
-  const [solPrice, setSolPrice] = useState<number>(0);
-  const [usdcPrice, setUsdcPrice] = useState<number>(1);
+  const [donateWithToken] = useState<"TOKEN">("TOKEN");
+  // const [solPrice, setSolPrice] = useState<number>(0);
+  // const [usdcPrice, setUsdcPrice] = useState<number>(1);
   const [mintSuccessDialog, setMintSuccessDialog] = useState<{
     open: boolean;
     tokensMinted: number;
@@ -123,8 +110,8 @@ export default function Home() {
   const tokenName = process.env.NEXT_PUBLIC_TOKEN_NAME || "Token";
   const tokenSymbol = process.env.NEXT_PUBLIC_TOKEN_SYMBOL || "TOKEN";
   const tokenImage = process.env.NEXT_PUBLIC_TOKEN_IMAGE_URL;
-  const tokenDescription =
-    process.env.NEXT_PUBLIC_PROJECT_DESCRIPTION || "Support our community!";
+  // const tokenDescription =
+  //   process.env.NEXT_PUBLIC_PROJECT_DESCRIPTION || "Support our community!";
   const mintableSupply = parseInt(
     process.env.NEXT_PUBLIC_MINTABLE_SUPPLY || "1000000"
   );
@@ -153,18 +140,33 @@ export default function Home() {
     !customAmount ||
     parsedDonationAmount < minimumDonationAmount;
 
+  const fetchMessages = useCallback(async () => {
+    try {
+      const response = await fetch(`/api/messages?sort=${sortBy}&limit=20`);
+      if (response.ok) {
+        const data: MessagesResponse = await response.json();
+        setMessages(data.data.donations);
+        setStats(data.data.stats);
+        // Find biggest donor
+        if (data.data.donations.length > 0) {
+          const biggest = data.data.donations.reduce((prev, current) =>
+            prev.amount_usd > current.amount_usd ? prev : current
+          );
+          setBiggestDonor(biggest);
+        } else {
+          setBiggestDonor(null);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch messages:", err);
+    }
+  }, [sortBy]);
+
   useEffect(() => {
     setMounted(true);
     fetchMessages();
-    fetchPrices();
-  }, [sortBy]);
-
-  // Fetch token prices
-  const fetchPrices = async () => {
-    const [sol, usdc] = await Promise.all([getSolPrice(), getUsdcPrice()]);
-    setSolPrice(sol);
-    setUsdcPrice(usdc);
-  };
+    // fetchPrices();
+  }, [fetchMessages]);
 
   // Fetch USDC balance when wallet connects
   useEffect(() => {
@@ -267,28 +269,6 @@ export default function Home() {
     fetchTokenBalance();
   }, [fetchTokenBalance]);
 
-  const fetchMessages = async () => {
-    try {
-      const response = await fetch(`/api/messages?sort=${sortBy}&limit=20`);
-      if (response.ok) {
-        const data: MessagesResponse = await response.json();
-        setMessages(data.data.donations);
-        setStats(data.data.stats);
-        // Find biggest donor
-        if (data.data.donations.length > 0) {
-          const biggest = data.data.donations.reduce((prev, current) =>
-            prev.amount_usd > current.amount_usd ? prev : current
-          );
-          setBiggestDonor(biggest);
-        } else {
-          setBiggestDonor(null);
-        }
-      }
-    } catch (err) {
-      console.error("Failed to fetch messages:", err);
-    }
-  };
-
   // Calculate amount based on slider percentage
   useEffect(() => {
     const balance = tokenBalance;
@@ -360,14 +340,14 @@ export default function Home() {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  // const formatDate = (dateString: string) => {
+  //   return new Date(dateString).toLocaleDateString("en-US", {
+  //     month: "short",
+  //     day: "numeric",
+  //     hour: "2-digit",
+  //     minute: "2-digit",
+  //   });
+  // };
 
   if (!mounted) {
     return null; // Avoid hydration mismatch
@@ -410,6 +390,7 @@ export default function Home() {
             <div className="container mx-auto px-4 py-4 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 {tokenImage && (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={tokenImage}
                     alt={tokenName}
@@ -1100,6 +1081,35 @@ export default function Home() {
                         Amount
                       </label>
 
+                      {/* Token Balance Hint */}
+                      {isTokenDonation && tokenBalance === 0 && (
+                        <div
+                          className="text-sm p-3 rounded-lg mb-3"
+                          style={{
+                            background:
+                              theme === "dark"
+                                ? "rgba(255, 255, 255, 0.06)"
+                                : "rgba(0, 0, 0, 0.06)",
+                            color:
+                              theme === "dark"
+                                ? "rgba(255, 255, 255, 0.7)"
+                                : "rgba(113, 113, 122, 1)",
+                          }}
+                        >
+                          You don&apos;t have any {tokenSymbol} tokens. Get some
+                          in the Donate section.{" "}
+                          <button
+                            onClick={() => setActiveTab("donate")}
+                            className="font-medium underline hover:text-primary"
+                            style={{
+                              color: "#744AC9",
+                            }}
+                          >
+                            Donate here
+                          </button>
+                        </div>
+                      )}
+
                       {/* Donate With Token Selector - REMOVED as per request */}
                       {/* <div className="flex gap-2 mb-3">
                       {[{ value: "TOKEN", label: tokenSymbol }].map((token) => (
@@ -1383,7 +1393,7 @@ export default function Home() {
                       <Textarea
                         value={donorMessage}
                         onChange={(e) => setDonorMessage(e.target.value)}
-                        placeholder="Ex: I love your project!"
+                        placeholder="I love this community!"
                         rows={3}
                         className="bg-transparent border-gray-600"
                         style={{
@@ -1806,7 +1816,7 @@ export default function Home() {
                         {isProcessing ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Minting...
+                            Donating...
                           </>
                         ) : (
                           `Donate ${mintAmount} USDC`

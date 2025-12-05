@@ -3,12 +3,7 @@
 import { useState, useMemo } from "react";
 import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { createX402Client } from "x402-solana/client";
-import {
-  PublicKey,
-  Transaction,
-  SystemProgram,
-  LAMPORTS_PER_SOL,
-} from "@solana/web3.js";
+import { PublicKey, Transaction } from "@solana/web3.js";
 import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
@@ -37,8 +32,9 @@ export function useX402Payment() {
         signTransaction,
       },
       network,
+      rpcUrl: connection.rpcEndpoint,
     });
-  }, [publicKey, signTransaction]);
+  }, [publicKey, signTransaction, connection.rpcEndpoint]);
 
   const createMerchantATA = async () => {
     if (!publicKey || !sendTransaction || !connection) {
