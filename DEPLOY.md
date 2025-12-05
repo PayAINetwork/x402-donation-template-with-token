@@ -85,10 +85,11 @@ pnpm install
 cp .env.example .env.local
 # Edit .env.local with your values
 
-# 4. Run database migrations
-pnpm drizzle-kit push
-
-# 5. Deploy to Vercel
+# 4. Deploy to Vercel:
+#    - Import the project into Vercel.
+#    - Set the environment variables as defined in `.env.example`.
+#    - Note: Database migrations will run automatically during the build process (`pnpm db:migrate`). Ensure your `DATABASE_URL` is correct.
+#    - Deploy.
 vercel
 ```
 

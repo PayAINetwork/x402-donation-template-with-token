@@ -26,7 +26,7 @@
       "required": true
     },
     {
-      "key": "RESOURCE_SERVER_WALLET_ADDRESS",
+      "key": "NEXT_PUBLIC_MERCHANT_WALLET_ADDRESS",
       "description": "Public key of wallet that receives payments",
       "required": true
     },
@@ -36,8 +36,54 @@
       "required": true
     },
     {
+      "key": "NEXT_PUBLIC_TOKEN_MINT",
+      "description": "Token Mint Address",
+      "required": true
+    },
+    {
+      "key": "NEXT_PUBLIC_TOKEN_NAME",
+      "description": "Token Name",
+      "required": true
+    },
+    {
+      "key": "NEXT_PUBLIC_TOKEN_SYMBOL",
+      "description": "Token Symbol",
+      "required": true
+    },
+    {
+      "key": "NEXT_PUBLIC_TOKEN_DECIMALS",
+      "description": "Token Decimals",
+      "required": true,
+      "default": "9"
+    },
+    {
+      "key": "NEXT_PUBLIC_TOKEN_IMAGE_URL",
+      "description": "Token Image URL",
+      "required": true
+    },
+    {
+      "key": "NEXT_PUBLIC_PROJECT_DESCRIPTION",
+      "description": "Description of your project",
+      "required": true
+    },
+    {
       "key": "TOTAL_SUPPLY",
       "description": "Total token supply",
+      "required": true
+    },
+    {
+      "key": "NEXT_PUBLIC_MINTABLE_SUPPLY",
+      "description": "Mintable token supply",
+      "required": true
+    },
+    {
+      "key": "DOLLAR_TO_TOKEN_RATIO",
+      "description": "Tokens per dollar",
+      "required": true
+    },
+    {
+      "key": "NEXT_PUBLIC_DONATION_TARGET",
+      "description": "Donation target in USD",
       "required": true
     },
     {
@@ -51,11 +97,6 @@
       "description": "Solana RPC endpoint",
       "required": true,
       "default": "https://api.devnet.solana.com"
-    },
-    {
-      "key": "NEXT_PUBLIC_PROJECT_DESCRIPTION",
-      "description": "Description of your project",
-      "required": true
     },
     {
       "key": "FACILITATOR_URL",
