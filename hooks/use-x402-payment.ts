@@ -45,8 +45,7 @@ export function useX402Payment() {
       throw new Error("Wallet not connected");
     }
 
-    const merchantWalletAddress =
-      process.env.NEXT_PUBLIC_MERCHANT_WALLET_ADDRESS;
+    const merchantWalletAddress = process.env.NEXT_PUBLIC_MERCHANT_ADDRESS;
     const tokenMintAddress = process.env.NEXT_PUBLIC_TOKEN_MINT;
     if (!merchantWalletAddress || !tokenMintAddress) {
       throw new Error(

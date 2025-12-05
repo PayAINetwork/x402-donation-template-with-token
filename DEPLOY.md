@@ -2,7 +2,7 @@
 
 This template can be deployed to Vercel with one click:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMbdulrohim%2Fx402-donation-with-token-template&env=DATABASE_URL,RESOURCE_SERVER_WALLET_ADDRESS,RESOURCE_SERVER_KEYPAIR,TOTAL_SUPPLY,NEXT_PUBLIC_SOLANA_NETWORK,NEXT_PUBLIC_SOLANA_RPC_URL,NEXT_PUBLIC_TOKEN_MINT,NEXT_PUBLIC_TOKEN_NAME,NEXT_PUBLIC_TOKEN_SYMBOL,NEXT_PUBLIC_TOKEN_IMAGE_URL,NEXT_PUBLIC_PROJECT_DESCRIPTION,NEXT_PUBLIC_MINTABLE_SUPPLY,NEXT_PUBLIC_DONATION_TARGET&envDescription=Required%20environment%20variables%20for%20the%20token%20donation%20platform&envLink=https%3A%2F%2Fgithub.com%2FMbdulrohim%2Fx402-donation-with-token-template%2Fblob%2Fmain%2F.env.example&project-name=token-donation-platform&repository-name=token-donation-platform)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FMbdulrohim%2Fx402-donation-with-token-template&env=DATABASE_URL,NEXT_PUBLIC_MERCHANT_ADDRESS,MERCHANT_PRIVATE_KEY,TOTAL_SUPPLY,NEXT_PUBLIC_SOLANA_NETWORK,NEXT_PUBLIC_SOLANA_RPC_URL,NEXT_PUBLIC_TOKEN_MINT,NEXT_PUBLIC_TOKEN_NAME,NEXT_PUBLIC_TOKEN_SYMBOL,NEXT_PUBLIC_TOKEN_IMAGE_URL,NEXT_PUBLIC_PROJECT_DESCRIPTION,NEXT_PUBLIC_MINTABLE_SUPPLY,NEXT_PUBLIC_DONATION_TARGET&envDescription=Required%20environment%20variables%20for%20the%20token%20donation%20platform&envLink=https%3A%2F%2Fgithub.com%2FMbdulrohim%2Fx402-donation-with-token-template%2Fblob%2Fmain%2F.env.example&project-name=token-donation-platform&repository-name=token-donation-platform)
 
 ## Prerequisites
 
@@ -33,8 +33,8 @@ During deployment, you'll be asked to provide these environment variables:
 ### Required
 
 - `DATABASE_URL`: Your Neon Postgres connection string
-- `RESOURCE_SERVER_WALLET_ADDRESS`: Public key of your resource server wallet
-- `RESOURCE_SERVER_KEYPAIR`: Base58 encoded private key
+- `NEXT_PUBLIC_MERCHANT_ADDRESS`: Public key of your resource server wallet
+- `MERCHANT_PRIVATE_KEY`: Base58 encoded private key
 - `TOTAL_SUPPLY`: Total token supply (e.g., 1000000000)
 - `NEXT_PUBLIC_SOLANA_NETWORK`: `solana-devnet` or `solana`
 - `NEXT_PUBLIC_SOLANA_RPC_URL`: Solana RPC endpoint
@@ -105,7 +105,7 @@ vercel
 
 - Ensure the resource server wallet has enough tokens
 - Check that the wallet has enough SOL for transaction fees
-- Verify the RESOURCE_SERVER_KEYPAIR is correctly encoded
+- Verify the MERCHANT_PRIVATE_KEY is correctly encoded
 
 ### Payment Issues
 
