@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({
@@ -25,10 +26,7 @@ const customJestConfig = {
     "!**/coverage/**",
     "!**/dist/**",
   ],
-  testMatch: [
-    "**/__tests__/**/*.[jt]s?(x)",
-    "**/?(*.)+(spec|test).[jt]s?(x)",
-  ],
+  testMatch: ["**/__tests__/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],
   testPathIgnorePatterns: ["/node_modules/", "/.next/"],
   transformIgnorePatterns: [
     "/node_modules/",

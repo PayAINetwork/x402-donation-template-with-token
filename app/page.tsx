@@ -67,6 +67,16 @@ interface MessagesResponse {
   };
 }
 
+interface DonationResult {
+  data: {
+    usdEquivalent: number;
+    tokensDonated: number;
+    name?: string;
+    message?: string;
+    transactionSignature: string;
+  };
+}
+
 export default function Home() {
   // theme comes from next-themes ThemeProvider (or system) — map to 'dark'|'light'
   const { resolvedTheme } = useTheme();
@@ -93,7 +103,9 @@ export default function Home() {
   const [donorName, setDonorName] = useState("");
   const [donorMessage, setDonorMessage] = useState("");
   const [sortBy, setSortBy] = useState<"recent" | "top">("recent");
-  const [donationResult, setDonationResult] = useState<any>(null);
+  const [donationResult, setDonationResult] = useState<DonationResult | null>(
+    null
+  );
   const [activeTab, setActiveTab] = useState<"post" | "donate">("post");
   const [mintAmount, setMintAmount] = useState("1");
   const [selectedQuickAmount, setSelectedQuickAmount] = useState<string | null>(
@@ -223,7 +235,17 @@ export default function Home() {
 
       const accountData = parsedTokenAccounts.value[0].account
         .data as ParsedAccountData;
-      const tokenAmountInfo = (accountData?.parsed as any)?.info?.tokenAmount;
+      const tokenAmountInfo = (
+        accountData?.parsed as {
+          info?: {
+            tokenAmount?: {
+              amount: string;
+              decimals: number;
+              uiAmount: number | null;
+            };
+          };
+        }
+      )?.info?.tokenAmount;
 
       if (!tokenAmountInfo) {
         setTokenBalance(0);
@@ -294,7 +316,7 @@ export default function Home() {
         name: donorName || undefined,
         message: donorMessage || undefined,
       });
-      setDonationResult(result);
+      setDonationResult(result as DonationResult);
       setCustomAmount("0");
       setSliderPercentage(10);
       setDonorName("");
@@ -320,7 +342,7 @@ export default function Home() {
         amount,
       });
       if (result) {
-        const mintData = result as any;
+        const mintData = result as { data?: { tokensMinted?: number } };
         setMintSuccessDialog({
           open: true,
           tokensMinted: mintData.data?.tokensMinted || 0,

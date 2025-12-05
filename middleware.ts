@@ -313,13 +313,13 @@ export type {
 const network = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || "solana-devnet") as
   | "solana"
   | "solana-devnet";
-const resourceWallet = process.env.RESOURCE_SERVER_WALLET_ADDRESS;
+const resourceWallet = process.env.NEXT_PUBLIC_MERCHANT_WALLET_ADDRESS;
 const tokenMint = process.env.NEXT_PUBLIC_TOKEN_MINT;
 
 // Validate required environment variables
 if (!resourceWallet) {
   throw new Error(
-    "RESOURCE_SERVER_WALLET_ADDRESS environment variable is required but not set"
+    "NEXT_PUBLIC_MERCHANT_WALLET_ADDRESS environment variable is required but not set"
   );
 }
 
