@@ -342,10 +342,10 @@ export const middleware = paymentMiddleware(
     },
     // Donate route: Pay with TOKEN, write to community board (dynamic amount, 1 TOKEN minimum)
     "/api/write-message": {
-      price: `1 ${tokenMint}`, // Minimum 1 TOKEN payment, actual amount from request
+      price: "$1", // Minimum $1 payment in USDC, actual amount from request
       network,
       config: {
-        description: "Donate tokens and write to community board",
+        description: "Donate to receive tokens and write to community board",
         mimeType: "application/json",
       },
     },

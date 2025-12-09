@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "pnpm db:migrate && pnpm test && next build --webpack",
+    "build": "pnpm lint && pnpm db:migrate && pnpm test && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "jest",

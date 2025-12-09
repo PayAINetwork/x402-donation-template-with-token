@@ -34,12 +34,6 @@ export function DonationSuccess({
     return `${hash.slice(0, 8)}...${hash.slice(-8)}`;
   };
 
-  const copyTxHash = () => {
-    if (transactionSignature) {
-      navigator.clipboard.writeText(transactionSignature);
-    }
-  };
-
   return (
     <div
       className="flex flex-col items-center justify-center"
@@ -190,8 +184,10 @@ export function DonationSuccess({
                   >
                     TxHash
                   </span>
-                  <button
-                    onClick={copyTxHash}
+                  <a
+                    href={`https://solscan.io/tx/${transactionSignature}?cluster=devnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm font-semibold underline cursor-pointer hover:opacity-80 transition-opacity"
                     style={{
                       color:
@@ -201,7 +197,7 @@ export function DonationSuccess({
                     }}
                   >
                     {formatTxHash(transactionSignature)}
-                  </button>
+                  </a>
                 </div>
 
                 {/* Separator */}

@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTokenConfig } from "@/lib/token";
+import {
+  getTokenConfig,
+  calculateTokensForDonation,
+  transferTokens,
+} from "@/lib/token";
 import { storeDonation } from "@/lib/db";
 
 export interface WriteMessageRequest {
-  amount: number; // TOKEN amount (minimum 1)
+  amount: number; // USD amount (minimum 1)
   name?: string; // Optional donor name
   message?: string; // Optional message
 }
@@ -17,7 +21,7 @@ export interface WriteMessageRequest {
  *
  * Body:
  * {
- *   "amount": 100,          // TOKEN amount
+ *   "amount": 100,          // USD amount
  *   "name": "John Doe",     // optional
  *   "message": "To the moon!" // optional
  * }
@@ -55,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Validate amount
     if (!amount || amount < 1) {
       return NextResponse.json(
-        { success: false, error: "Amount must be at least 1 TOKEN" },
+        { success: false, error: "Amount must be at least $1" },
         { status: 400 }
       );
     }
@@ -63,29 +67,36 @@ export async function POST(request: NextRequest) {
     // Get token configuration
     const tokenConfig = getTokenConfig();
 
-    // Calculate USD equivalent for display purposes
-    const usdEquivalent = amount / tokenConfig.dollarToTokenRatio;
+    // Calculate tokens to mint
+    const tokensToMint = calculateTokensForDonation(
+      amount,
+      tokenConfig.dollarToTokenRatio
+    );
+
+    // Transfer tokens to donor
+    await transferTokens(payerAddress, tokensToMint);
 
     // Store donation record with message in database
-    // Note: We don't mint tokens here - user is paying WITH tokens
     await storeDonation(
       payerAddress,
-      usdEquivalent,
-      amount,
+      amount, // amountUsd
+      tokensToMint, // tokensAmount
       name,
       message,
-      transactionSignature // Pass the transaction signature from payment response
+      transactionSignature
     );
 
     return NextResponse.json({
       success: true,
       message: `Thank you${
         name ? `, ${name},` : ""
-      } for your ${amount.toLocaleString()} ${tokenConfig.symbol} donation!`,
+      } for your $${amount} donation! You received ${tokensToMint.toLocaleString()} ${
+        tokenConfig.symbol
+      }.`,
       data: {
         donator: payerAddress,
-        tokensDonated: amount,
-        usdEquivalent: usdEquivalent,
+        tokensDonated: tokensToMint,
+        usdEquivalent: amount,
         tokenSymbol: tokenConfig.symbol,
         name: name || null,
         message: message || null,
