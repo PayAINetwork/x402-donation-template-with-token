@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useWallet, useConnection } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletOverlay } from "@/components/wallet-overlay-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,8 +16,7 @@ import {
 import { useX402Payment } from "@/hooks/use-x402-payment";
 
 import { Loader2 } from "lucide-react";
-import { PublicKey } from "@solana/web3.js";
-import type { ParsedAccountData } from "@solana/web3.js";
+
 import { useTheme } from "next-themes";
 import { DonationItem } from "@/components/donation-item";
 import { DonationSuccess } from "@/components/donation-success";
@@ -69,7 +68,7 @@ export default function Home() {
   const theme = (resolvedTheme as "dark" | "light" | undefined) || "light";
 
   const { connected, publicKey, disconnect } = useWallet();
-  const { connection } = useConnection();
+
   const walletOverlay = useWalletOverlay();
   const { initiatePayment, isProcessing } = useX402Payment();
   const [mounted, setMounted] = useState(false);
@@ -83,7 +82,6 @@ export default function Home() {
     null
   );
   const [usdcBalance, setUsdcBalance] = useState<number>(0);
-  const [tokenBalance, setTokenBalance] = useState<number>(0);
 
   const [customAmount, setCustomAmount] = useState("0");
   const [donorName, setDonorName] = useState("");
@@ -194,70 +192,6 @@ export default function Home() {
     fetchUsdcBalance();
   }, [connected, publicKey]);
 
-  // Fetch token balance when wallet connects
-  const fetchTokenBalance = useCallback(async () => {
-    if (!connected || !publicKey) {
-      setTokenBalance(0);
-      return;
-    }
-
-    const tokenMintAddress = process.env.NEXT_PUBLIC_TOKEN_MINT;
-
-    if (!tokenMintAddress) {
-      setTokenBalance(0);
-      return;
-    }
-
-    try {
-      const tokenMint = new PublicKey(tokenMintAddress);
-      const parsedTokenAccounts =
-        await connection.getParsedTokenAccountsByOwner(publicKey, {
-          mint: tokenMint,
-        });
-
-      if (!parsedTokenAccounts.value.length) {
-        setTokenBalance(0);
-        return;
-      }
-
-      const accountData = parsedTokenAccounts.value[0].account
-        .data as ParsedAccountData;
-      const tokenAmountInfo = (
-        accountData?.parsed as {
-          info?: {
-            tokenAmount?: {
-              amount: string;
-              decimals: number;
-              uiAmount: number | null;
-            };
-          };
-        }
-      )?.info?.tokenAmount;
-
-      if (!tokenAmountInfo) {
-        setTokenBalance(0);
-        return;
-      }
-
-      const balance =
-        tokenAmountInfo.uiAmount ??
-        Number(tokenAmountInfo.amount) / Math.pow(10, tokenAmountInfo.decimals);
-
-      setTokenBalance(balance || 0);
-    } catch (error) {
-      console.error("Failed to fetch token balance:", error);
-      setTokenBalance(0);
-    }
-  }, [connected, publicKey, connection]);
-
-  useEffect(() => {
-    fetchTokenBalance();
-  }, [fetchTokenBalance]);
-
-  // const handleSliderChange = (percentage: number) => {
-  //   setSliderPercentage(percentage);
-  // };
-
   const handleDonate = async () => {
     if (!connected || !customAmount) return;
 
@@ -279,7 +213,6 @@ export default function Home() {
       setDonorName("");
       setDonorMessage("");
       fetchMessages(); // Refresh messages
-      fetchTokenBalance(); // Refresh token balance
     } catch (err) {
       console.error("Donation failed:", err);
     }
