@@ -371,7 +371,13 @@ export default function Home() {
                 alignItems: "flex-start",
                 padding: "16px 24px",
                 gap: "24px",
-                background: theme === "dark" ? "#09090b" : "#FFFFFF",
+                background:
+                  theme === "dark"
+                    ? "rgba(18, 18, 18, 0.4)"
+                    : "rgba(255, 255, 255, 0.3)",
+                backdropFilter: theme === "dark" ? "blur(32px)" : "blur(60px)",
+                boxShadow:
+                  theme === "dark" ? "0px 1.66px 0px 0px #000000" : "none",
                 borderRadius: "12px",
                 alignSelf: "stretch",
                 marginBottom: "32px",
