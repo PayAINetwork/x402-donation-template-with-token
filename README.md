@@ -190,7 +190,6 @@ This template connects to **Vercel Storage (Neon Postgres)** both locally and in
 3. **Deploy x402 schema:**
    - Your site is now live at `your-project.vercel.app`
    - x402 schema accessible at `your-project.vercel.app/.well-known/x402.json`
-  - Merchant USDC ATA is auto-initialized on first page load via `/api/merchant/ensure-ata` (idempotent)
 
 ## 🔧 Configuration
 

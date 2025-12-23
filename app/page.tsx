@@ -142,15 +142,6 @@ export default function Home() {
     setMounted(true);
     fetchMessages();
     fetchPrices();
-    // Ensure merchant USDC ATA exists so first payment doesn't fail
-    const ensureMerchantAta = async () => {
-      try {
-        await fetch("/api/merchant/ensure-ata", { method: "POST" });
-      } catch (error) {
-        console.warn("Failed to ensure merchant ATA", error);
-      }
-    };
-    ensureMerchantAta();
   }, [sortBy]);
 
   // Fetch token prices
